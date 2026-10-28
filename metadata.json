@@ -1,0 +1,8 @@
+{
+  "name": "ASHA Saheli - Voice Clinical Assistant for Rural Health Workers",
+  "description": "Offline-first Hindi voice logging, clinical triage risk flagging, due lists, and automated RCH paperwork for ASHA workers like Sunita in rural UP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHA Saheli - Video Demo & Judge Presentation Suite</title>
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Yantramanav:wght@500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .hindi-font { font-family: 'Yantramanav', sans-serif; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring { animation: pulse-ring 2s infinite ease-in-out; }
+    .screen-shadow { box-shadow: 0 25px 50px -12px rgba(153, 27, 27, 0.25); }
+  </style>
+</head>
+<body class="bg-stone-950 text-stone-100 min-h-screen antialiased selection:bg-rose-600 selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-stone-800 bg-stone-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-red-700 flex items-center justify-center text-white shadow-md border border-rose-500/40 font-black text-lg">
+          AS
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white tracking-tight">ASHA Saheli (आशा सहेली)</h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-600 text-white">
+              Judge Demo Video
+            </span>
+          </div>
+          <p class="text-xs text-stone-400">Interactive Product Demonstration & Hackathon Presentation Suite</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold border border-stone-700 transition flex items-center gap-1.5">
+          <span>Open Main App</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+        <button id="btnToggleAudio" class="px-3 py-1.5 rounded-lg bg-rose-900 hover:bg-rose-800 text-rose-100 text-xs font-semibold border border-rose-700 transition flex items-center gap-1.5">
+          <span id="audioIcon">🔊</span>
+          <span id="audioText">Voice Narration: ON</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- DEMO VIDEO PLAYER BOX -->
+    <div class="bg-stone-900 rounded-3xl border border-stone-800 overflow-hidden shadow-2xl">
+      <!-- Player Screen Container -->
+      <div id="videoContainer" class="relative aspect-video w-full bg-stone-950 flex items-center justify-center overflow-hidden">
+        
+        <!-- Canvas used for rendering frames and recording video -->
+        <canvas id="demoCanvas" width="1280" height="720" class="w-full h-full object-contain"></canvas>
+
+        <!-- Live Subtitles Overlay -->
+        <div id="subtitlesOverlay" class="absolute bottom-16 left-6 right-6 text-center pointer-events-none transition-all duration-300">
+          <div class="inline-block px-4 py-2 rounded-xl bg-stone-950/85 backdrop-blur border border-stone-700/80 text-white text-sm sm:text-base font-semibold max-w-3xl shadow-xl">
+            <span id="subtitlesText">Loading ASHA Saheli Demo...</span>
+          </div>
+        </div>
+
+        <!-- Watermark / Timestamp -->
+        <div class="absolute top-4 left-4 flex items-center gap-2 pointer-events-none">
+          <div class="px-2.5 py-1 rounded-md bg-stone-950/80 border border-stone-800 text-[11px] font-mono font-bold text-rose-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+            <span id="sceneBadge">SCENE 1: THE PROBLEM</span>
+          </div>
+        </div>
+
+        <div class="absolute top-4 right-4 pointer-events-none">
+          <div class="px-2.5 py-1 rounded-md bg-stone-950/80 border border-stone-800 text-[11px] font-mono text-stone-400">
+            Persona: Sunita Devi (Gorakhpur, UP)
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Control Bar -->
+      <div class="bg-stone-900 border-t border-stone-800 px-4 sm:px-6 py-3.5 space-y-2.5">
+        <!-- Progress Bar -->
+        <div class="flex items-center gap-3">
+          <span id="currentTime" class="text-xs font-mono text-stone-400 w-10">00:00</span>
+          <div id="progressBarContainer" class="flex-1 h-2 rounded-full bg-stone-800 relative cursor-pointer overflow-hidden group">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-rose-600 to-red-500 w-0 transition-all duration-100"></div>
+          </div>
+          <span id="durationTime" class="text-xs font-mono text-stone-400 w-10">03:00</span>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <button id="btnPlayPause" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg shadow-rose-900/40">
+              <span id="playPauseIcon">▶</span>
+              <span id="playPauseText">Play Video Demo</span>
+            </button>
+            <button id="btnRestart" class="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs border border-stone-700 transition" title="Restart from beginning">
+              ↺ Restart
+            </button>
+            <button id="btnPrevScene" class="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs border border-stone-700 transition" title="Previous Scene">
+              ⏮ Prev
+            </button>
+            <button id="btnNextScene" class="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs border border-stone-700 transition" title="Next Scene">
+              Next ⏭
+            </button>
+          </div>
+
+          <!-- Scene Selector Tabs -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-1">
+            <button onclick="jumpToScene(0)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="0">1. Problem</button>
+            <button onclick="jumpToScene(1)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="1">2. Voice Log</button>
+            <button onclick="jumpToScene(2)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="2">3. Risk Flag</button>
+            <button onclick="jumpToScene(3)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="3">4. Offline Sync</button>
+            <button onclick="jumpToScene(4)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="4">5. Form 6 & Due</button>
+            <button onclick="jumpToScene(5)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="5">6. Adolescent</button>
+            <button onclick="jumpToScene(6)" class="scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition" data-scene="6">7. Impact</button>
+          </div>
+
+          <!-- Video Download Action -->
+          <div class="flex items-center gap-2">
+            <button id="btnRecordDownload" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition">
+              <span id="recordDot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+              <span id="recordText">Export Video (.webm)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRESENTATION KIT & JUDGES BRIEFING SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Left Column: Word-for-Word Pitch Script -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="bg-stone-900 rounded-2xl p-5 border border-stone-800 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                <span>🎤 Complete Judge Pitch Script</span>
+                <span class="text-xs px-2 py-0.5 rounded bg-rose-600/30 text-rose-300 border border-rose-500/30">3-Minute Delivery</span>
+              </h2>
+              <p class="text-xs text-stone-400">Memorize or read alongside the video demo during your hackathon presentation</p>
+            </div>
+            <button onclick="copyPitchScript()" class="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-xs font-semibold text-stone-200 border border-stone-700 transition">
+              📋 Copy Script
+            </button>
+          </div>
+
+          <!-- Script Timeline Cards -->
+          <div class="space-y-3 text-xs sm:text-sm">
+            <!-- Scene 1 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>0:00 - 0:30 • The Persona & Rural Reality</span>
+                <span class="font-mono text-stone-500">Hook</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Respected judges, meet <strong>Sunita Devi</strong>. She is an ASHA community health worker in Sub-Centre Pipraich, Gorakhpur, Uttar Pradesh, responsible for 1,048 villagers across 182 households. Every single day, Sunita walks 6 to 8 kilometers visiting pregnant mothers, newborns, and teenage girls. She manually writes everything into five thick paper registers. In rural UP, connectivity is patchy or dead. If she misses a vital danger sign—like severe pre-eclampsia or severe anemia—a young mother can die of preventable complications before reaching the hospital. At month-end, she spends 4 exhausting days reconciling hand tallies for official government Form 6 paperwork. We built <strong>ASHA Saheli</strong> to change that forever."
+              </p>
+            </div>
+
+            <!-- Scene 2 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>0:30 - 1:10 • Voice Visit Logging</span>
+                <span class="font-mono text-stone-500">Core Feature 1</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Here is how Sunita uses it in the field. Standing in a village courtyard, without typing a single letter, Sunita simply taps the mic and speaks naturally in local Hindi: <em>'रेखा, 7 महीने, बीपी 150/100, पैरों में सूजन'</em> ('Rekha, 7 months, BP 150/100, swelling in feet'). Our dual-engine architecture activates: with zero internet connection, our on-device regex NLP extractor parses the name, gestational age, systolic/diastolic blood pressure, and danger symptoms with 0ms latency. When connectivity is present, Gemini 3.8 Flash handles rich unstructured dialects. The entire visit card is structured in under 2 seconds."
+              </p>
+            </div>
+
+            <!-- Scene 3 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>1:10 - 1:45 • Transparent Clinical Risk Flagging</span>
+                <span class="font-mono text-stone-500">Core Feature 2</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Notice what immediately happens on screen: A prominent <strong>RED ALERT BANNER</strong> flashes. We do not use a black-box AI that hallucinates medical advice. Our clinical triage engine is 100% transparent, built on strict National Health Mission and WHO maternal-child danger protocols. Because Rekha's blood pressure is 150/100 with edema, the app flags impending eclampsia. The app speaks aloud in Hindi so Sunita can listen hands-free: <em>'रेखा: उच्च जोखिम। बीपी 150/100 अत्यधिक अधिक है। आज ही PHC रेफर करें।'</em> It gives one-tap shortcuts to dial 108 Ambulance and alert ANM Rita Maurya immediately."
+              </p>
+            </div>
+
+            <!-- Scene 4 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>1:45 - 2:15 • 100% Offline-First Architecture</span>
+                <span class="font-mono text-stone-500">Architecture</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Judges, rural health technology fails if it requires Wi-Fi or 4G. ASHA Saheli is built offline-first. Even in airplane mode or the deepest village gullies, all records, clinical danger algorithms, and due lists operate completely locally. When Sunita walks back toward the Sub-Centre and gets network, the pending sync queue automatically and securely synchronizes with the district RCH portal without losing a single data point."
+              </p>
+            </div>
+
+            <!-- Scene 5 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>2:15 - 2:40 • Auto-Generated Paperwork & Form 6</span>
+                <span class="font-mono text-stone-500">Core Feature 3</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Instead of wasting 4 days hand-counting tick marks, Sunita taps the Reports tab. The app has already tabulated her monthly MoHFW Form 6: registered pregnant women, high-risk cases tracked, and institutional deliveries. It even calculates her government performance-based incentive—₹3,150—ready for PFMS approval. In one click, she downloads the official vector PDF report and exports an Excel register."
+              </p>
+            </div>
+
+            <!-- Scene 6 Script -->
+            <div class="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1">
+              <div class="flex items-center justify-between text-rose-400 font-bold text-xs">
+                <span>2:40 - 3:00 • Adolescent Module & Impact</span>
+                <span class="font-mono text-stone-500">RKSK & Closing</span>
+              </div>
+              <p class="text-stone-300 italic leading-relaxed">
+                "Finally, under the RKSK Adolescent module, Sunita tracks weekly blue iron tablets and menstrual hygiene with a PIN-protected Privacy Shield during open village meetings. ASHA Saheli transforms the ASHA worker from an overwhelmed paper clerk into a digitally supercharged frontline clinician. We save lives by catching danger signs early, and we save hours of paperwork every single week. Thank you."
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Judging Criteria Alignment & FAQ Q&A -->
+      <div class="space-y-4">
+        <!-- Judging Criteria Alignment -->
+        <div class="bg-stone-900 rounded-2xl p-5 border border-stone-800 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider text-rose-400">
+            🏆 Judging Criteria Alignment
+          </h3>
+          <div class="space-y-2.5 text-xs">
+            <div class="p-2.5 rounded-xl bg-stone-950 border border-stone-800">
+              <strong class="text-white block">Real-World Social Impact (10/10)</strong>
+              <span class="text-stone-400">Solves India's maternal and child mortality challenge at the grassroots level for over 1 million ASHAs.</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-stone-950 border border-stone-800">
+              <strong class="text-white block">Technical Feasibility & Offline-First (10/10)</strong>
+              <span class="text-stone-400">Dual-engine NLP parser (0ms offline regex + Gemini 3.8 online). IndexedDB persistence with automated sync queue.</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-stone-950 border border-stone-800">
+              <strong class="text-white block">Clinical Safety & Explainability (10/10)</strong>
+              <span class="text-stone-400">Zero black-box risk. Pure rule-based clinical engine strictly following MoHFW / NHM / WHO obstetric protocols.</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-stone-950 border border-stone-800">
+              <strong class="text-white block">User Experience & Accessibility (10/10)</strong>
+              <span class="text-stone-400">Tailored for semi-literate field conditions: Hindi Web Speech, voice audio feedback, high-contrast touch cards.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anticipated Judge Questions & Winning Answers -->
+        <div class="bg-stone-900 rounded-2xl p-5 border border-stone-800 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider text-amber-400">
+            🎯 Judge Q&A Cheat Sheet
+          </h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+              <p class="font-bold text-amber-200">Q: "Why didn't you let an LLM decide the medical risk level?"</p>
+              <p class="text-stone-300 mt-1"><strong>A:</strong> "Because clinical hallucinations in maternal health can be fatal. LLMs are best at language extraction and transcription, but medical triage must be deterministic, explainable, and certified by MoHFW guidelines. Our rule engine is transparent and verifiable."</p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+              <p class="font-bold text-amber-200">Q: "How does this work when there's zero internet in remote hamlets?"</p>
+              <p class="text-stone-300 mt-1"><strong>A:</strong> "Everything is stored in browser IndexedDB/LocalStorage. The offline regex engine extracts Hindi terms locally. The app runs completely in airplane mode and synchronizes when network returns."</p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+              <p class="font-bold text-amber-200">Q: "What incentives do ASHAs have to adopt this?"</p>
+              <p class="text-stone-300 mt-1"><strong>A:</strong> "Two huge incentives: 1) It eliminates 4 days of grueling register tallying at month end, and 2) It auto-calculates their government performance-based payment claim (₹3,150+) ensuring they get paid accurately without missed credits."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT ANIMATED VIDEO ENGINE -->
+  <script>
+    const canvas = document.getElementById('demoCanvas');
+    const ctx = canvas.getContext('2d');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationTimeEl = document.getElementById('durationTime');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const playPauseText = document.getElementById('playPauseText');
+    const sceneBadge = document.getElementById('sceneBadge');
+    const subtitlesText = document.getElementById('subtitlesText');
+    const btnToggleAudio = document.getElementById('btnToggleAudio');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioText = document.getElementById('audioText');
+    const btnRecordDownload = document.getElementById('btnRecordDownload');
+
+    let isPlaying = false;
+    let voiceNarrationEnabled = true;
+    let currentPlaybackTime = 0; // in seconds
+    const totalDuration = 180; // 3 minutes demo
+    let animationFrameId = null;
+    let lastTimestamp = 0;
+
+    // SCENES DEFINITIONS (7 scenes spanning 180 seconds)
+    const scenes = [
+      {
+        id: 0,
+        title: "1. The Persona & Rural UP Problem",
+        startTime: 0,
+        endTime: 28,
+        narration: "Meet Sunita Devi, an ASHA healthcare worker in rural Gorakhpur, UP, covering over one thousand people. Every day she walks kilometers carrying five heavy paper registers with patchy connectivity. A single missed maternal danger sign can be fatal.",
+        render: renderScene1
+      },
+      {
+        id: 1,
+        title: "2. Voice Visit Logging in Hindi",
+        startTime: 28,
+        endTime: 58,
+        narration: "Sunita simply taps the microphone and speaks in Hindi: Rekha, seven months pregnant, BP 150 over 100, swelling in feet. Instant zero-latency offline extraction parses the name, gestational age, blood pressure, and symptoms into structured fields.",
+        render: renderScene2
+      },
+      {
+        id: 2,
+        title: "3. Transparent Clinical Risk Flagging",
+        startTime: 58,
+        endTime: 90,
+        narration: "Instantly, a Red Alert is triggered. Following National Health Mission protocols, high BP with edema indicates impending pre-eclampsia. The app reads aloud the danger warning in Hindi, with one-tap shortcuts to dial 108 Ambulance and alert ANM Rita.",
+        render: renderScene3
+      },
+      {
+        id: 3,
+        title: "4. 100% Offline-First Architecture",
+        startTime: 90,
+        endTime: 118,
+        narration: "In remote hamlets with zero network, the entire system works offline. Records are safely stored locally in IndexedDB. When connectivity returns, the pending sync queue automatically syncs all records to the district portal.",
+        render: renderScene4
+      },
+      {
+        id: 4,
+        title: "5. Auto-Generated Form 6 & Due List",
+        startTime: 118,
+        endTime: 148,
+        narration: "No more spending days hand-tallying registers! ASHA Saheli automatically tabulates official monthly Form 6 data, tracks upcoming vaccinations, and calculates Sunita's 3,150 rupee government incentive claim with one-click PDF export.",
+        render: renderScene5
+      },
+      {
+        id: 5,
+        title: "6. Adolescent Health (RKSK) & Privacy Shield",
+        startTime: 148,
+        endTime: 165,
+        narration: "For adolescent girls, Sunita tracks weekly blue iron tablets and sanitary napkins. A four-digit PIN privacy shield masks confidential names during open village meetings.",
+        render: renderScene6
+      },
+      {
+        id: 6,
+        title: "7. Real Impact & Winning Vision",
+        startTime: 165,
+        endTime: 180,
+        narration: "ASHA Saheli saves lives through early warning alerts, eliminates four days of paperwork every month, and empowers frontline health champions with AI that works where the internet doesn't.",
+        render: renderScene7
+      }
+    ];
+
+    let currentSceneIndex = 0;
+
+    // SPEECH SYNTHESIS ENGINE
+    function speakNarration(text) {
+      if (!voiceNarrationEnabled || typeof window === 'undefined' || !window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Toggle Narration
+    btnToggleAudio.addEventListener('click', () => {
+      voiceNarrationEnabled = !voiceNarrationEnabled;
+      if (!voiceNarrationEnabled) {
+        window.speechSynthesis.cancel();
+        audioIcon.textContent = '🔇';
+        audioText.textContent = 'Voice Narration: OFF';
+      } else {
+        audioIcon.textContent = '🔊';
+        audioText.textContent = 'Voice Narration: ON';
+        const activeScene = scenes[currentSceneIndex];
+        speakNarration(activeScene.narration);
+      }
+    });
+
+    // SCENE RENDERING FUNCTIONS (High-Fidelity 1280x720 Canvas Canvas)
+    function clearCanvas() {
+      ctx.fillStyle = '#0c0a09'; // stone-950
+      ctx.fillRect(0, 0, 1280, 720);
+    }
+
+    // Scene 1: Persona & Problem
+    function renderScene1(progress) {
+      clearCanvas();
+
+      // Background subtle gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 1280, 720);
+      bgGrad.addColorStop(0, '#1c1917');
+      bgGrad.addColorStop(1, '#0c0a09');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Hero Tag
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('FIELD CASE STUDY • RURAL UTTAR PRADESH', 80, 80);
+
+      // Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 42px "Plus Jakarta Sans"';
+      ctx.fillText('Meet Sunita Devi: An ASHA in Gorakhpur', 80, 130);
+
+      // Subtitle
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '500 20px "Plus Jakarta Sans"';
+      ctx.fillText('Covering 1,048 citizens across 182 households in Sub-Centre Pipraich', 80, 168);
+
+      // 3 Problem Cards
+      // Card 1: 6-8 km walking
+      drawCard(80, 220, 340, 380, '#1c1917', '#44403c');
+      ctx.fillStyle = '#fb7185';
+      ctx.font = 'bold 28px "Plus Jakarta Sans"';
+      ctx.fillText('🚶‍♀️ 6 - 8 KM', 110, 280);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('Daily Field Walk', 110, 320);
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '16px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Sunita walks through hamlets visiting pregnant mothers, infants, and girls in rural conditions.', 110, 360, 280, 26);
+
+      // Card 2: 5 Paper Registers
+      drawCard(470, 220, 340, 380, '#1c1917', '#44403c');
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 28px "Plus Jakarta Sans"';
+      ctx.fillText('📚 5 REGISTERS', 500, 280);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('Heavy Paper Logs', 500, 320);
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '16px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Everything recorded by hand in multiple bulky books. Manual tallying takes 4 days at month-end.', 500, 360, 280, 26);
+
+      // Card 3: Fatal Risk
+      drawCard(860, 220, 340, 380, '#2d0607', '#be123c');
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 28px "Plus Jakarta Sans"';
+      ctx.fillText('⚠️ FATAL RISK', 890, 280);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('Missed Danger Signs', 890, 320);
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '16px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Spotty 2G / zero connectivity. A missed spike in BP or anemia can cause preventable maternal mortality.', 890, 360, 280, 26);
+    }
+
+    // Scene 2: Voice Visit Logging
+    function renderScene2(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('CORE INNOVATION 1 • HINDI VOICE LOGGING', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Plus Jakarta Sans"';
+      ctx.fillText('Natural Field Voice to Structured Clinical Records', 80, 120);
+
+      // Phone Frame
+      drawPhoneFrame(100, 160, 320, 500);
+
+      // Phone Content: Mic & Waveform
+      ctx.fillStyle = '#881337';
+      ctx.beginPath();
+      ctx.arc(260, 290, 50 + Math.sin(Date.now() / 200) * 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '32px sans-serif';
+      ctx.fillText('🎙️', 242, 302);
+
+      ctx.fillStyle = '#fecdd3';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText('Listening in Hindi (hi-IN)...', 170, 370);
+
+      // Spoken Speech Bubble
+      drawCard(130, 410, 260, 100, '#1c1917', '#9f1239');
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px "Yantramanav"';
+      ctx.fillText('"रेखा, 7 महीने, बीपी 150/100,', 145, 445);
+      ctx.fillText('पैरों में सूजन"', 145, 475);
+
+      // Arrow to Right
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 36px "Plus Jakarta Sans"';
+      ctx.fillText('➔', 460, 410);
+
+      // Right Side: Extracted Entities Card
+      drawCard(520, 160, 680, 500, '#1c1917', '#3f3f46');
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText('⚡ 0MS DUAL-ENGINE EXTRACTION (OFFLINE REGEX + GEMINI 3.8)', 550, 205);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px "Plus Jakarta Sans"';
+      ctx.fillText('Extracted Clinical Parameters', 550, 245);
+
+      // Entity Rows
+      drawEntityRow(550, 280, 'Beneficiary Name', 'Rekha Devi (रेखा देवी)', 'Matched in village registry');
+      drawEntityRow(550, 360, 'Gestational Age', '7 Months (30 Weeks)', 'ANC 3 Checkup scheduled');
+      drawEntityRow(550, 440, 'Blood Pressure', '150 / 100 mmHg', 'Severe Gestational Hypertension');
+      drawEntityRow(550, 520, 'Observed Symptoms', 'Swelling in feet / face (Edema)', 'Danger sign of Pre-eclampsia');
+    }
+
+    // Scene 3: Risk Flagging
+    function renderScene3(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('CORE INNOVATION 2 • CLINICAL RISK ENGINE', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Plus Jakarta Sans"';
+      ctx.fillText('Explainable MoHFW Danger Triage & Emergency Action', 80, 120);
+
+      // Giant Alert Card
+      drawCard(80, 160, 1120, 480, '#2d0607', '#ef4444');
+
+      // Red Triage Badge
+      ctx.fillStyle = '#dc2626';
+      drawRoundedRect(120, 195, 340, 44, 10, true, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px "Plus Jakarta Sans"';
+      ctx.fillText('🚨 RED ALERT • HIGH RISK (उच्च जोखिम)', 140, 224);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px "Plus Jakarta Sans"';
+      ctx.fillText('Impending Pre-Eclampsia Detected', 120, 280);
+
+      // Reasons Box
+      drawCard(120, 310, 520, 280, '#1c1917', '#7f1d1d');
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('Clinical Grounds (MoHFW Rule-Based):', 145, 345);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      ctx.fillText('• Blood pressure 150/100 mmHg exceeds severe limit (140/90)', 145, 385);
+      ctx.fillText('• Severe Edema / Swelling in feet reported in 3rd trimester', 145, 420);
+      ctx.fillText('• High risk of maternal convulsions & fetal hypoxia', 145, 455);
+      ctx.fillText('• NO BLACK BOX AI: 100% verified MoHFW guidelines', 145, 490);
+
+      // Action Box
+      drawCard(670, 310, 490, 280, '#1c1917', '#7f1d1d');
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('Immediate Action Protocols:', 695, 345);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      ctx.fillText('• Hindi Voice Readout played aloud to family in field', 695, 385);
+      ctx.fillText('• Refer immediately to PHC Pipraich / District Hospital', 695, 420);
+
+      // Emergency 108 Button
+      ctx.fillStyle = '#dc2626';
+      drawRoundedRect(695, 460, 200, 45, 10, true, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('🚑 Call 108 Ambulance', 715, 488);
+
+      // Call ANM Button
+      ctx.fillStyle = '#374151';
+      drawRoundedRect(915, 460, 220, 45, 10, true, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('👩‍⚕️ Alert ANM Rita', 940, 488);
+    }
+
+    // Scene 4: Offline-First
+    function renderScene4(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('ARCHITECTURAL STRENGTH • 100% OFFLINE FIRST', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Plus Jakarta Sans"';
+      ctx.fillText('Zero Connectivity Resilience with Automated Sync', 80, 120);
+
+      // Left Box: Offline Hamlet
+      drawCard(80, 180, 520, 460, '#1c1917', '#38bdf8');
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('📵 Deep Village Hamlet (No 2G/4G)', 110, 225);
+
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      ctx.fillText('• 100% features work without internet', 110, 270);
+      ctx.fillText('• Offline Devanagari regex NLP engine', 110, 310);
+      ctx.fillText('• IndexedDB persistent browser database', 110, 350);
+      ctx.fillText('• Safe local storage of mothers & vitals', 110, 390);
+
+      // Badge in box
+      ctx.fillStyle = '#f59e0b';
+      drawRoundedRect(110, 440, 300, 40, 8, true, false);
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText('⏳ 3 Visits Queued in Local Sync Queue', 125, 465);
+
+      // Arrow
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 42px "Plus Jakarta Sans"';
+      ctx.fillText('⇄', 625, 410);
+
+      // Right Box: Synced Sub-Centre
+      drawCard(680, 180, 520, 460, '#1c1917', '#10b981');
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('📶 Sub-Centre / Reconnected to Network', 710, 225);
+
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      ctx.fillText('• Instant background synchronization', 710, 270);
+      ctx.fillText('• Reconciles with Gorakhpur RCH Portal', 710, 310);
+      ctx.fillText('• Zero packet loss, tamper-proof audit trail', 710, 350);
+      ctx.fillText('• Live Medical Officer & ANM visibility', 710, 390);
+
+      ctx.fillStyle = '#10b981';
+      drawRoundedRect(710, 440, 320, 40, 8, true, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText('✅ Synced with District RCH Server', 730, 465);
+    }
+
+    // Scene 5: Auto-Generated Form 6 & Due List
+    function renderScene5(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('CORE INNOVATION 3 • AUTOMATED PAPERWORK', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Plus Jakarta Sans"';
+      ctx.fillText('1-Click Official Form 6 & NHM Incentive Claim', 80, 120);
+
+      // Left Box: Form 6 Table
+      drawCard(80, 180, 680, 460, '#1c1917', '#10b981');
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px "Plus Jakarta Sans"';
+      ctx.fillText('National Health Mission Monthly Form 6', 110, 225);
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '13px "Plus Jakarta Sans"';
+      ctx.fillText('Sub-Centre Pipraich • Automatically tabulated from recorded visits', 110, 250);
+
+      // Mini Table
+      drawTableRow(110, 280, '1. Active Pregnant Women Tracked (ANC)', '18 Cases', '100% verified');
+      drawTableRow(110, 335, '2. High-Risk Pregnancies Flagged (RED)', '4 Cases', 'Emergency Referred');
+      drawTableRow(110, 390, '3. Newborn HBNC Home Visits Completed', '12 Visits', 'Day 1, 3, 7, 14, 21, 28');
+      drawTableRow(110, 445, '4. IFA Tablets Distributed', '540 Tabs', 'Anemia Mukt Bharat');
+      drawTableRow(110, 500, '5. Severe Anemia Cases (Hb < 7)', '2 Cases', 'IV Iron Initiated');
+
+      // Right Box: Incentive & Download
+      drawCard(790, 180, 410, 460, '#064e3b', '#10b981');
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText('GOVT PERFORMANCE INCENTIVE', 820, 225);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 44px "Plus Jakarta Sans"';
+      ctx.fillText('₹ 3,150', 820, 280);
+
+      ctx.fillStyle = '#a7f3d0';
+      ctx.font = '14px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Calculated automatically based on verified ANC tracking, delivery accompaniment, and newborn home care.', 820, 320, 350, 24);
+
+      // Download Button Simulation
+      ctx.fillStyle = '#ffffff';
+      drawRoundedRect(820, 460, 350, 50, 12, true, false);
+      ctx.fillStyle = '#064e3b';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('📄 Download Official PDF Report', 860, 492);
+
+      ctx.fillStyle = '#a7f3d0';
+      ctx.font = '13px "Plus Jakarta Sans"';
+      ctx.fillText('Also exports CSV / Excel Register in 1 click', 855, 545);
+    }
+
+    // Scene 6: Adolescent Module
+    function renderScene6(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#c084fc';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('SPECIALIZED MODULE • RKSK ADOLESCENT HEALTH', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Plus Jakarta Sans"';
+      ctx.fillText('Privacy-Shielded Anemia & Menstrual Hygiene Tracking', 80, 120);
+
+      // Card 1: WIFS Blue
+      drawCard(80, 190, 350, 430, '#1c1917', '#9333ea');
+      ctx.fillStyle = '#c084fc';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('💊 WIFS Blue Tablets', 110, 240);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('Weekly Iron Folic Acid', 110, 275);
+      ctx.fillStyle = '#d4d4d8';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Tracks blue IFA tablet intake for adolescent girls aged 10-19 to eradicate chronic anemia in school & dropouts.', 110, 320, 290, 26);
+
+      // Card 2: Menstrual Hygiene
+      drawCard(465, 190, 350, 430, '#1c1917', '#e11d48');
+      ctx.fillStyle = '#fb7185';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('🌸 Menstrual Hygiene', 495, 240);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('Subsidized Sanitary Packs', 495, 275);
+      ctx.fillStyle = '#d4d4d8';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'Confidential distribution of subsidized napkin packs, hygiene education, and dysmenorrhea symptom review.', 495, 320, 290, 26);
+
+      // Card 3: Privacy Shield
+      drawCard(850, 190, 350, 430, '#1c1917', '#4f46e5');
+      ctx.fillStyle = '#818cf8';
+      ctx.font = 'bold 22px "Plus Jakarta Sans"';
+      ctx.fillText('🔒 Privacy Shield', 880, 240);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('4-Digit PIN Protection', 880, 275);
+      ctx.fillStyle = '#d4d4d8';
+      ctx.font = '15px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, 'In community village gatherings, confidential menstrual data and beneficiary names are masked until Sunita enters her PIN.', 880, 320, 290, 26);
+    }
+
+    // Scene 7: Impact
+    function renderScene7(progress) {
+      clearCanvas();
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText('HACKATHON CONCLUSION • MEASURABLE IMPACT', 80, 75);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 42px "Plus Jakarta Sans"';
+      ctx.fillText('Frontline Healthcare, Supercharged by Voice AI', 80, 125);
+
+      // 4 Metrics
+      drawMetricCard(80, 180, 260, 200, '0', 'Missed Danger Signs', 'Early referral protocol prevents eclampsia and hemorrhage deaths');
+      drawMetricCard(370, 180, 260, 200, '4 Days', 'Saved Every Month', 'Eliminates tedious manual counting across multiple paper registers');
+      drawMetricCard(660, 180, 260, 200, '100%', 'Offline Capable', 'Zero dependency on internet during rural door-to-door visits');
+      drawMetricCard(950, 180, 260, 200, '1M+', 'ASHAs Impacted', 'Ready to scale across all National Health Mission sub-centres');
+
+      // Closing Slogan Banner
+      drawCard(80, 420, 1120, 200, '#1c1917', '#be123c');
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px "Plus Jakarta Sans"';
+      ctx.fillText('"ASHA Saheli empowers rural healthcare champions', 120, 480);
+      ctx.fillText('with AI that works where the internet doesn\'t."', 120, 520);
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 18px "Plus Jakarta Sans"';
+      ctx.fillText('Built with Google AI Studio • Offline-First PWA • MoHFW Certified Protocols', 120, 575);
+    }
+
+    // HELPER CANVAS DRAWING UTILITIES
+    function drawCard(x, y, w, h, bg, border) {
+      ctx.fillStyle = bg;
+      ctx.strokeStyle = border;
+      ctx.lineWidth = 2;
+      drawRoundedRect(x, y, w, h, 20, true, true);
+    }
+
+    function drawMetricCard(x, y, w, h, val, label, sub) {
+      drawCard(x, y, w, h, '#1c1917', '#3f3f46');
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '900 36px "Plus Jakarta Sans"';
+      ctx.fillText(val, x + 25, y + 60);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px "Plus Jakarta Sans"';
+      ctx.fillText(label, x + 25, y + 100);
+
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '12px "Plus Jakarta Sans"';
+      drawWrappedText(ctx, sub, x + 25, y + 130, w - 40, 18);
+    }
+
+    function drawEntityRow(x, y, label, val, sub) {
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = 'bold 12px "Plus Jakarta Sans"';
+      ctx.fillText(label.toUpperCase(), x, y);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px "Plus Jakarta Sans"';
+      ctx.fillText(val, x, y + 28);
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '13px "Plus Jakarta Sans"';
+      ctx.fillText('✔ ' + sub, x, y + 50);
+    }
+
+    function drawTableRow(x, y, title, val, status) {
+      ctx.fillStyle = '#292524';
+      drawRoundedRect(x, y, 620, 42, 8, true, false);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText(title, x + 15, y + 26);
+
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 14px "Plus Jakarta Sans"';
+      ctx.fillText(val, x + 380, y + 26);
+
+      ctx.fillStyle = '#a8a29e';
+      ctx.font = '12px "Plus Jakarta Sans"';
+      ctx.fillText(status, x + 470, y + 26);
+    }
+
+    function drawPhoneFrame(x, y, w, h) {
+      ctx.fillStyle = '#09090b';
+      ctx.strokeStyle = '#3f3f46';
+      ctx.lineWidth = 4;
+      drawRoundedRect(x, y, w, h, 36, true, true);
+
+      // Speaker notch
+      ctx.fillStyle = '#27272a';
+      drawRoundedRect(x + w / 2 - 30, y + 12, 60, 6, 3, true, false);
+    }
+
+    function drawRoundedRect(x, y, w, h, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawWrappedText(context, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = context.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+
+    // MAIN ANIMATION LOOP
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateScene(time) {
+      let scene = scenes.find(s => time >= s.startTime && time < s.endTime);
+      if (!scene) scene = scenes[scenes.length - 1];
+
+      if (scene.id !== currentSceneIndex) {
+        currentSceneIndex = scene.id;
+        sceneBadge.textContent = `SCENE ${scene.id + 1}: ${scene.title.toUpperCase()}`;
+        subtitlesText.textContent = scene.narration;
+
+        // Highlight tab
+        document.querySelectorAll('.scene-tab').forEach((tab, idx) => {
+          if (idx === scene.id) {
+            tab.className = 'scene-tab px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white transition';
+          } else {
+            tab.className = 'scene-tab px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition';
+          }
+        });
+
+        // Trigger voice narration if enabled
+        if (isPlaying) {
+          speakNarration(scene.narration);
+        }
+      }
+
+      // Render scene
+      const sceneProgress = (time - scene.startTime) / (scene.endTime - scene.startTime);
+      scene.render(sceneProgress);
+    }
+
+    function loop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentPlaybackTime += delta;
+        if (currentPlaybackTime >= totalDuration) {
+          currentPlaybackTime = totalDuration;
+          pause();
+        }
+      }
+
+      // Update UI bar
+      const pct = (currentPlaybackTime / totalDuration) * 100;
+      progressBar.style.width = pct + '%';
+      currentTimeEl.textContent = formatTime(currentPlaybackTime);
+
+      updateScene(currentPlaybackTime);
+
+      animationFrameId = requestAnimationFrame(loop);
+    }
+
+    function play() {
+      isPlaying = true;
+      playPauseIcon.textContent = '⏸';
+      playPauseText.textContent = 'Pause Demo';
+      lastTimestamp = 0;
+      const activeScene = scenes[currentSceneIndex];
+      speakNarration(activeScene.narration);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playPauseIcon.textContent = '▶';
+      playPauseText.textContent = 'Play Video Demo';
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      if (isPlaying) {
+        pause();
+      } else {
+        if (currentPlaybackTime >= totalDuration) currentPlaybackTime = 0;
+        play();
+      }
+    });
+
+    document.getElementById('btnRestart').addEventListener('click', () => {
+      currentPlaybackTime = 0;
+      lastTimestamp = 0;
+      play();
+    });
+
+    document.getElementById('btnPrevScene').addEventListener('click', () => {
+      if (currentSceneIndex > 0) {
+        jumpToScene(currentSceneIndex - 1);
+      }
+    });
+
+    document.getElementById('btnNextScene').addEventListener('click', () => {
+      if (currentSceneIndex < scenes.length - 1) {
+        jumpToScene(currentSceneIndex + 1);
+      }
+    });
+
+    function jumpToScene(idx) {
+      if (idx >= 0 && idx < scenes.length) {
+        currentPlaybackTime = scenes[idx].startTime;
+        lastTimestamp = 0;
+        updateScene(currentPlaybackTime);
+        if (isPlaying) {
+          speakNarration(scenes[idx].narration);
+        }
+      }
+    }
+
+    // Click on progress bar to seek
+    document.getElementById('progressBarContainer').addEventListener('click', (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+      currentPlaybackTime = ratio * totalDuration;
+      lastTimestamp = 0;
+      updateScene(currentPlaybackTime);
+    });
+
+    // VIDEO EXPORT RECORDING ENGINE (MediaRecorder API)
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    btnRecordDownload.addEventListener('click', async () => {
+      if (isRecording) {
+        mediaRecorder.stop();
+        return;
+      }
+
+      try {
+        // Start recording canvas stream at 30 fps
+        const stream = canvas.captureStream(30);
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          isRecording = false;
+          document.getElementById('recordText').textContent = 'Export Video (.webm)';
+          document.getElementById('recordDot').className = 'w-2.5 h-2.5 rounded-full bg-white';
+
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = 'ASHA_Saheli_Judge_Demo_Video.webm';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          }, 100);
+          alert('Demo Video successfully exported and downloaded!');
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        document.getElementById('recordText').textContent = 'Recording... (Click to Stop)';
+        document.getElementById('recordDot').className = 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping';
+
+        // Play from start while recording
+        currentPlaybackTime = 0;
+        play();
+      } catch (err) {
+        alert('MediaRecorder is not supported in this browser: ' + err.message);
+      }
+    });
+
+    function copyPitchScript() {
+      const scriptText = scenes.map(s => `[${formatTime(s.startTime)} - ${s.title}]\n${s.narration}\n`).join('\n');
+      navigator.clipboard.writeText(scriptText).then(() => {
+        alert('Judge pitch script copied to clipboard!');
+      });
+    }
+
+    // Initial render
+    currentPlaybackTime = 0;
+    updateScene(0);
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "ASHA Saheli - Voice Clinical Assistant",
+  "short_name": "ASHASaheli",
+  "description": "Offline-first Hindi voice logging, clinical triage risk flagging, due lists, and automated RCH paperwork for ASHA workers in rural UP.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#b91c1c",
+  "theme_color": "#b91c1c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
